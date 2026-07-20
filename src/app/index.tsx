@@ -1,98 +1,101 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { Logo } from '@/components/Logo';
+import { Button, Card, Felt } from '@/components/ui';
+import { useGame } from '@/state/GameProvider';
+import { colors, spacing, type } from '@/theme';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { ready, game, state, abandonGame } = useGame();
+  const [abandonVisible, setAbandonVisible] = useState(false);
+
+  const inProgress = ready && game !== null && state?.winnerId == null;
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <Felt>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.hero}>
+          <Logo size={150} />
+          <Text style={styles.title}>Score{'\n'}the Pigs</Text>
+          <Text style={[type.eyebrow, styles.tagline]}>
+            Pass the pigs · minus the math
+          </Text>
+        </View>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+        <View style={styles.actions}>
+          {inProgress && state ? (
+            <Card style={styles.resumeCard}>
+              <Text style={type.eyebrow}>Game in progress</Text>
+              <Text style={type.caption}>
+                {state.players.map((p) => `${p.name} ${p.total}`).join('  ·  ')}
+              </Text>
+              <Button
+                label="Resume game"
+                variant="accent"
+                onPress={() => router.push('/game')}
+              />
+              <Button
+                label="Abandon game"
+                variant="danger"
+                onPress={() => setAbandonVisible(true)}
+              />
+            </Card>
+          ) : null}
+          <Button
+            label="New game"
+            variant={inProgress ? 'card' : 'accent'}
+            onPress={() => router.push('/setup')}
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
+          <Button label="Players" onPress={() => router.push('/stats')} />
+          <Button label="How to play" onPress={() => router.push('/rules')} />
+        </View>
       </SafeAreaView>
-    </ThemedView>
+
+      <ConfirmDialog
+        visible={abandonVisible}
+        title="Abandon game?"
+        message="The game ends now with no winner. Nothing is saved to history or stats."
+        actionLabel="Abandon"
+        onConfirm={() => {
+          setAbandonVisible(false);
+          abandonGame();
+        }}
+        onCancel={() => setAbandonVisible(false)}
+      />
+    </Felt>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    padding: spacing.xl,
+    justifyContent: 'space-between',
   },
-  safeArea: {
+  hero: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    gap: spacing.m,
   },
   title: {
+    ...type.title,
+    fontSize: 44,
+    lineHeight: 52,
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
+  tagline: {
+    color: colors.textDim,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  actions: {
+    gap: spacing.m,
+  },
+  resumeCard: {
+    gap: spacing.m,
   },
 });

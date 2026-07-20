@@ -1,5 +1,40 @@
 {
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run test:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx expo lint:*)",
+      "Bash(npx expo-doctor:*)",
+      "Bash(npx expo install --check)",
+      "Bash(node scripts/generate-icons.js)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(file:*)",
+      "Read"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.p8)",
+      "Read(./**/*.p12)",
+      "Read(./**/*.key)",
+      "Read(./**/*.jks)",
+      "Read(./**/*.mobileprovision)",
+      "Bash(rm -rf /:*)",
+      "Bash(git push --force:*)"
+    ]
   }
 }

@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# vscode
+.vscode/
+
 # Expo
 .expo/
 dist/
@@ -21,23 +24,37 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
+# testing
+coverage/
+
 # debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
 # macOS
 .DS_Store
 *.pem
 
+# editors
+.idea/
+*.swp
+
 # local env files
+.env
 .env*.local
 
 # typescript
 *.tsbuildinfo
 
-example
-
 # generated native folders
 /ios
 /android
+
+# agent tooling
+# .agents/skills is vendored from skills-lock.json; .claude/settings.json is
+# checked in, per-developer overrides are not.
+.agents/skills/
+.claude/settings.local.json
+.claude/skills/

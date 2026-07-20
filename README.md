@@ -1,56 +1,50 @@
-# Welcome to your Expo app 👋
+# Score the Pigs 🐷
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile scorekeeping companion for the dice game
+[Pass the Pigs](docs/pass-the-pigs-rules.md). One phone, passed around the
+table: it does the pig math, tracks turns and penalties, and keeps lifetime
+player stats.
 
-## Get started
+Built with [Expo](https://expo.dev) (React Native + TypeScript, Expo Router).
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Running it
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then scan the QR code with the **Expo Go** app on your phone (same Wi-Fi
+network), or press `i` to open the iOS Simulator (requires Xcode).
 
-### Other setup steps
+For a **native iOS build** (`npm run ios`) you also need your own Apple Team
+ID: `cp .env.example .env` and fill in `APPLE_TEAM_ID`. It isn't needed for the
+Expo Go workflow above.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Checks
 
-## Learn more
+The game engine (`src/engine/`) is pure TypeScript and fully unit tested:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm test           # jest
+npm run lint       # expo lint
+npx tsc --noEmit   # typecheck
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Project layout
 
-## Join the community
+- `src/engine/` — pure game logic: scoring, turn/penalty rules, event-log
+  replay (powers undo and history). No React imports.
+- `src/state/` — React context around the engine + AsyncStorage persistence.
+- `src/app/` — Expo Router screens: home, setup, game, roll history, rules,
+  players, per-player stats, and game recaps.
+- `src/theme.ts` — the "Felt Table" palette.
+- `docs/` — game rules and the design spec
+  (`docs/superpowers/specs/2026-07-19-pass-the-pigs-app-design.md`).
 
-Join our community of developers creating universal apps.
+A game is stored only as its event log, so scores are always re-derived by
+replay — see [AGENTS.md](AGENTS.md) for the full architecture notes.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+
+MIT — see [LICENSE](LICENSE).
